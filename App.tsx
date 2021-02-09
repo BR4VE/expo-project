@@ -1,16 +1,32 @@
 
 import React, { useEffect, useMemo } from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
 import { useRecorder, usePlayer } from './hooks';
 import { PlayerAudioInterface } from './interfaces';
-
-
-
+import { useForm } from "react-hook-form";
+import { createPost } from './requests';
 
 export default function App() {
   const { recording, startRecording, stopRecording} = useRecorder();
   const { playAudio, stopAudio, setAudios } = usePlayer();
-  const showPlaybutton = useMemo(() => !!recording?.uri && !recording.isRecording, [recording]);
+  const { register, handleSubmit, setValue } = useForm();
+  const recordingFinished = useMemo(() => !!recording?.uri && !recording.isRecording, [recording]);
+
+  
+  function play() {
+    if(!recording) return;
+    playAudio(recording.id)
+  }
+
+  async function handlePostCreation(formData: any) {
+    const { title } = formData;
+    try {
+      const res = await createPost(title, recording);
+    } catch(err) {
+      console.log(err);
+    }
+    
+  }
 
   useEffect(() => {
     if(!recording?.uri) return;
@@ -19,21 +35,27 @@ export default function App() {
     setAudios([audioFile])
   }, [recording?.uri])
 
-  function play() {
-    if(!recording) return;
-    playAudio(recording.id)
-  }
+  useEffect(() => {
+      register("title");
+  }, [register]);
+
+  
 
 
   return (
     <View style={styles.container}>
+      <Text>Title:</Text>
+      <TextInput onChangeText={text => setValue("title", text)} style={styles.textInput} />
+
       <Button
         title={recording?.isRecording ? "Stop Recording" : "Start Recording"}
         onPress={recording?.isRecording ? stopRecording : startRecording}
       />
       <Text>Duration: {recording?.duration}</Text>
 
-      {showPlaybutton && <Button title="Play Sound" onPress={play} />}
+      {recordingFinished && <Button title="Play Sound" onPress={play} />}
+
+      {recordingFinished && <Button title="Create Post" onPress={handleSubmit(handlePostCreation)} />}
 
 
     </View>
@@ -47,4 +69,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  textInput: { height: 40, width:300, borderColor: 'gray', borderWidth: 1 }
 });
