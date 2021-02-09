@@ -21,20 +21,10 @@ class AudioService {
     return new RecordingContainer(recording);
   }
 
-  async playAudio(uri: string) {
+  async getAudio(uri: string) {
     const { sound } = await Audio.Sound.createAsync({ uri });
-    await sound.playAsync();
+    return sound;
   }
 }
 
 export default new AudioService(Audio);
-
-// getRecordingDurationInSeconds(status: RecordingStatusInterface) {
-//   const durationMillis: number = status.durationMillis || 0;
-
-//   return Math.floor(durationMillis / ONE_SECOND_AS_MILISECONDS);
-// }
-
-// checkRecordingDurationExceeds(duration: number) {
-//   return duration >= MAX_RECORDING_DURATION_IN_SECONDS;
-// }

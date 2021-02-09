@@ -1,20 +1,27 @@
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
-import { AudioService } from './services';
-import { useRecording } from './hooks';
+import { useRecorder, usePlayer } from './hooks';
+import { PlayerAudioInterface } from './interfaces';
+
 
 
 
 export default function App() {
-  const { recording, startRecording, stopRecording} = useRecording();
+  const { recording, startRecording, stopRecording} = useRecorder();
+  const { playAudio, stopAudio, setAudios } = usePlayer();
   const showPlaybutton = useMemo(() => !!recording?.uri && !recording.isRecording, [recording]);
 
-  async function playSound() {
-    if(recording) {
-      
-      await AudioService.playAudio(recording.uri);
-    }
+  useEffect(() => {
+    if(!recording?.uri) return;
+    const { id, uri } = recording;
+    const audioFile: PlayerAudioInterface = { id, uri };
+    setAudios([audioFile])
+  }, [recording?.uri])
+
+  function play() {
+    if(!recording) return;
+    playAudio(recording.id)
   }
 
 
@@ -26,7 +33,7 @@ export default function App() {
       />
       <Text>Duration: {recording?.duration}</Text>
 
-      {showPlaybutton && <Button title="Play Sound" onPress={playSound} />}
+      {showPlaybutton && <Button title="Play Sound" onPress={play} />}
 
 
     </View>

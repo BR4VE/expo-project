@@ -1,3 +1,4 @@
-import useRecording from "./recording";
+import useRecorder from "./recorder";
+import usePlayer from "./player";
 
-export { useRecording };
+export { useRecorder, usePlayer };

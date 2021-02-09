@@ -1,3 +1,4 @@
-import { RecordingStatusInterface } from "./recording";
+import { RecorderStatusInterface } from "./recorder";
+import { PlayerAudioInterface } from "./player";
 
-export { RecordingStatusInterface };
+export { RecorderStatusInterface, PlayerAudioInterface };
